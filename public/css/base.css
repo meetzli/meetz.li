@@ -1,0 +1,80 @@
+:root {
+    color-scheme: dark;
+    --bg: #1d2021;
+    --text: #ebdbb2;
+    --muted: #a89984;
+    --accent: #d65d0e;
+    --border: #665c54;
+    --border-light: #3c3836;
+    --nav-bg: #1d2021;
+    --nav-hover: #3c3836;
+    --serif: Georgia, "Palatino Linotype", Palatino, "Book Antiqua", serif;
+    --mono: Consolas, "Liberation Mono", Menlo, Monaco, monospace;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    height: 100%;
+}
+
+body {
+    font-family: var(--serif);
+    color: var(--text);
+    background-color: var(--bg);
+    line-height: 1.6;
+    height: 100%;
+    overflow: hidden;
+}
+
+#main {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--serif);
+    font-weight: normal;
+    color: var(--text);
+}
+
+p {
+    margin: 1.4rem 0;
+}
+
+::selection {
+    background: var(--accent);
+    color: var(--bg);
+}
+
+p,
+li {
+    text-wrap: pretty;
+}
+
+@supports not (text-wrap: pretty) {
+    p,
+    li {
+        text-wrap: balance;
+    }
+}
+
+h1,
+h2,
+h3 {
+    text-wrap: balance;
+}

@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+env:
+  DX_VERSION: 0.8.0-alpha.1
+  PUBLIC_DIR: target/dx/meetzli/release/web/public
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            tools/prerender
+
+      - name: Cache dx
+        id: dx-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/dx
+          key: dx-${{ env.DX_VERSION }}
+
+      - name: Install dx
+        if: steps.dx-cache.outputs.cache-hit != 'true'
+        run: cargo install dioxus-cli --version ${{ env.DX_VERSION }} --locked
+
+      - name: Repo cards
+        run: cargo run --release --manifest-path tools/prerender/Cargo.toml -- repos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bundle
+        run: dx bundle --release --web
+
+      - name: Prerender
+        run: cargo run --release --manifest-path tools/prerender/Cargo.toml -- ${{ env.PUBLIC_DIR }}
+
+      - name: Publish
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ${{ env.PUBLIC_DIR }} --project-name meetzli --branch main

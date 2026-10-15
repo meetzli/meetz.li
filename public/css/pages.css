@@ -1,0 +1,345 @@
+article {
+    width: 60%;
+    max-width: 720px;
+    margin: 0 auto 4em;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    hyphens: none;
+    text-align: left;
+    animation: page-in 0.35s ease-out both;
+}
+
+@keyframes page-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    article {
+        animation: none;
+    }
+}
+
+.project {
+    position: relative;
+    padding: 0 0 3rem 2rem;
+    transform-origin: top center;
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.project {
+    --dot: 10px;
+    --dot-top: calc(0.72rem - 5px);
+}
+
+.project::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: calc(var(--dot-top) + var(--dot));
+    bottom: calc(-1 * var(--dot-top));
+    width: 2px;
+    background: var(--border);
+}
+
+.project:last-child::before {
+    display: none;
+}
+
+.project::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: var(--dot-top);
+    width: var(--dot);
+    height: var(--dot);
+    background: var(--bg);
+    border: 2px solid var(--border);
+    transition: background-color 0.4s ease 0.2s, border-color 0.4s ease 0.2s;
+}
+
+.project.visible::after {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.when {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--muted);
+}
+
+@media (min-width: 1000px) {
+    .project {
+        --dot-top: calc(1.35rem - 5px);
+    }
+
+    .when {
+        position: absolute;
+        right: calc(100% + 1.25rem);
+        top: 0.63rem;
+        width: 9rem;
+        text-align: right;
+        white-space: nowrap;
+    }
+}
+
+.project.visible::after {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.when {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--muted);
+}
+
+@media (min-width: 1000px) {
+    .when {
+        position: absolute;
+        right: calc(100% + 1.25rem);
+        top: 0.6rem;
+        width: 9rem;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .project::before {
+        top: 1.5rem;
+    }
+
+    .project::after {
+        top: 1.05rem;
+    }
+}
+
+.project.visible {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .project {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+.project h2 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.project .meta {
+    margin: 0.2rem 0 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: left;
+    hyphens: none;
+}
+
+.project p:last-child {
+    margin-top: 0;
+}
+
+@media (max-width: 700px) {
+    article {
+        width: 90%;
+        text-align: left;
+    }
+}
+
+.project-preview {
+    display: block;
+    margin-top: 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.project-preview:hover {
+    border-color: var(--accent);
+}
+
+.project-preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+    object-fit: cover;
+    background: var(--nav-hover);
+}
+
+article {
+    position: relative;
+}
+
+article.typing,
+article.typing a {
+    color: transparent;
+    text-decoration-color: transparent;
+}
+
+::highlight(typed) {
+    color: var(--text);
+    text-decoration-color: var(--accent);
+}
+
+.caret {
+    position: absolute;
+    width: 0.55em;
+    background: var(--accent);
+    pointer-events: none;
+    animation: blink 0.9s steps(1) infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.post-list li {
+    margin: 0 0 1rem;
+    text-align: left;
+}
+
+.post-date {
+    display: inline-block;
+    min-width: 8.5rem;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.post-draft {
+    margin-left: 0.75rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+}
+
+.post h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.post-meta {
+    margin: 0.2rem 0 2rem;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: left;
+}
+
+.post-body {
+    text-align: left;
+    hyphens: none;
+}
+
+.post-body h2 {
+    font-size: 1.4rem;
+    margin: 2.5rem 0 0;
+}
+
+.codeblock {
+    position: relative;
+    isolation: isolate;
+    margin: 1.6rem 0;
+}
+
+.codeblock::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 50vw);
+    right: -1.5em;
+    background: #282828;
+    border-block: 1px solid var(--border-light);
+}
+
+.codeblock pre {
+    margin: 0;
+    padding: 1.1rem 0;
+    overflow-x: auto;
+    color: #ebdbb2;
+    font-size: min(1rem, calc(60vw / 29));
+    line-height: 1.5;
+}
+
+.post-body code {
+    font-family: var(--mono);
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+}
+
+.post-body :not(pre) > code {
+    padding: 0.15em 0.4em;
+    font-size: 0.9em;
+    color: var(--text);
+    background: #282828;
+    border-radius: 3px;
+}
+
+.hl-k { color: #fb4934; }
+.hl-s { color: #b8bb26; }
+.hl-n { color: #d3869b; }
+.hl-t { color: #fabd2f; }
+.hl-f { color: #83a598; }
+.hl-m { color: #fe8019; }
+.hl-l { color: #83a598; }
+.hl-a { color: #8ec07c; }
+.hl-c { color: #928374; font-style: italic; }
+
+@media (max-width: 700px) {
+    .post-date {
+        display: block;
+        min-width: 0;
+    }
+
+    .codeblock::before {
+        right: calc(50% - 50vw);
+    }
+
+    .codeblock pre {
+        font-size: min(1rem, calc(90vw / 29));
+    }
+
+    .post h1 {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .post-body :not(pre) > code {
+        font-size: 0.78em;
+    }
+}
+
+@media (max-width: 400px) {
+    .post-body :not(pre) > code {
+        font-size: 0.78em;
+    }
+}
