@@ -1,0 +1,13 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "devDependencies": {
+    "wrangler": "^4.157.0"
+  },
+  "private": true,
+  "scripts": {
+    "dev:cloudflare": "npm run build:wasm && wrangler pages dev public --port 8788",
+    "build:functions": "npm run build:wasm && wrangler pages functions build --outdir target/pages-functions",
+    "build:wasm": "bash tools/github-share/build.sh"
+  }
+}

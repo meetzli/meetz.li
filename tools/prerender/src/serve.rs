@@ -116,6 +116,63 @@ fn handle(mut client: TcpStream, upstream: &str, pages: &[Page], images: &Images
         path
     };
 
+    if let Some(repo) = path.strip_prefix("/gh/") {
+        let (repo, image) = repo
+            .strip_suffix("/image.png")
+            .map_or((repo, false), |r| (r, true));
+        if !crate::repos::valid(repo) {
+            return respond(
+                &mut client,
+                &request,
+                404,
+                "text/plain",
+                None,
+                b"invalid repository",
+            );
+        }
+        static CACHE: std::sync::OnceLock<
+            std::sync::Mutex<HashMap<String, (std::time::Instant, String, Vec<u8>)>>,
+        > = std::sync::OnceLock::new();
+        let mut cache = CACHE.get_or_init(Default::default).lock().unwrap();
+        cache.retain(|_, (time, _, _)| time.elapsed().as_secs() < 900);
+        if !cache.contains_key(repo) {
+            if let Ok((description, png)) = crate::repos::share(repo) {
+                if cache.len() >= 128 {
+                    cache.clear();
+                }
+                cache.insert(
+                    repo.to_string(),
+                    (std::time::Instant::now(), description, png),
+                );
+            }
+        }
+        return match cache.get(repo) {
+            Some((_, description, png)) => {
+                let html = crate::repos::html(repo, &description, &base(&request));
+                respond(
+                    &mut client,
+                    &request,
+                    200,
+                    if image {
+                        "image/png"
+                    } else {
+                        "text/html; charset=utf-8"
+                    },
+                    None,
+                    if image { png } else { html.as_bytes() },
+                )
+            }
+            None => respond(
+                &mut client,
+                &request,
+                502,
+                "text/plain",
+                None,
+                b"repository unavailable",
+            ),
+        };
+    }
+
     if let Some(name) = path
         .strip_prefix("/og/")
         .and_then(|n| n.strip_suffix(".png"))

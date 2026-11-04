@@ -1,3 +1,9 @@
 /target
 /.idea
 /tools/prerender/target
+
+/node_modules
+/.wrangler
+
+/tools/github-share/target
+/tools/github-share/pkg

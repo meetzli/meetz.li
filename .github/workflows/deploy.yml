@@ -28,6 +28,7 @@ jobs:
           workspaces: |
             .
             tools/prerender
+            tools/github-share
 
       - name: Cache dx
         id: dx-cache
@@ -39,6 +40,19 @@ jobs:
       - name: Install dx
         if: steps.dx-cache.outputs.cache-hit != 'true'
         run: cargo install dioxus-cli --version ${{ env.DX_VERSION }} --locked
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install wasm-bindgen
+        run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
+
+      - name: GitHub share WASM
+        run: npm run build:wasm
 
       - name: Repo cards
         run: cargo run --release --manifest-path tools/prerender/Cargo.toml -- repos

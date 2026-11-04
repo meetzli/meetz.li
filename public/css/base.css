@@ -1,3 +1,35 @@
+@font-face {
+    font-family: "Libron";
+    src: url("/fonts/libron/Libron-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Libron";
+    src: url("/fonts/libron/Libron-Italic.woff2") format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Libron";
+    src: url("/fonts/libron/Libron-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Libron";
+    src: url("/fonts/libron/Libron-BoldItalic.woff2") format("woff2");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
 :root {
     color-scheme: dark;
     --bg: #1d2021;
@@ -8,7 +40,7 @@
     --border-light: #3c3836;
     --nav-bg: #1d2021;
     --nav-hover: #3c3836;
-    --serif: Georgia, "Palatino Linotype", Palatino, "Book Antiqua", serif;
+    --serif: "Libron", Georgia, "Palatino Linotype", Palatino, "Book Antiqua", serif;
     --mono: Consolas, "Liberation Mono", Menlo, Monaco, monospace;
 }
 
