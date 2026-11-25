@@ -2,16 +2,17 @@
 name = "meetzli"
 version = "0.1.0"
 edition = "2024"
+publish = false
 
 [dependencies]
-dioxus = { version = "0.8.0-alpha.1", features = ["web", "router"] }
+yawn-web = { git = "https://github.com/yawn-rs/yawn" }
 pulldown-cmark = { version = "0.13.4", default-features = false, features = ["html"] }
 
+[workspace]
+
 [profile.dev]
-opt-level = 0
-debug = 1
-incremental = true
-split-debuginfo = "unpacked"
+debug = false
+opt-level = "s"
 
 [profile.release]
 opt-level = "z"

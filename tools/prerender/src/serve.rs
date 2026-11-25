@@ -5,7 +5,7 @@ use std::thread;
 use std::collections::HashMap;
 
 use crate::Result;
-use crate::{Page, card, head, pages, strip_previous, version};
+use crate::{Page, card, head, pages, strip_previous, strip_title, version};
 
 struct Request {
     method: String,
@@ -184,8 +184,8 @@ fn handle(mut client: TcpStream, upstream: &str, pages: &[Page], images: &Images
     }
 
     if let Some(page) = pages.iter().find(|page| page.route == path) {
-        let (_, body, _, _) = fetch(upstream, "/")?;
-        let html = strip_previous(&String::from_utf8_lossy(&body));
+        let (_, body, _, _) = fetch(upstream, &page.route)?;
+        let html = strip_title(&strip_previous(&String::from_utf8_lossy(&body)));
         let html = html.replace(
             "</head>",
             &format!(

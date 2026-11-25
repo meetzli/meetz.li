@@ -25,7 +25,7 @@ pub fn run(out: &Path) -> Result<()> {
 
     for project in data::PROJECTS {
         let Some(repo) = project.repo else { continue };
-        let file = project.image.trim_start_matches("/repos/");
+        let file = project.image.trim_start_matches("/assets/repos/");
 
         match share(repo).map(|(_, png)| png) {
             Ok(png) => {

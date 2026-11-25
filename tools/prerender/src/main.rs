@@ -37,7 +37,7 @@ fn main() {
     if std::env::args().nth(1).as_deref() == Some("repos") {
         let out = std::env::args()
             .nth(2)
-            .unwrap_or_else(|| "public/repos".into());
+            .unwrap_or_else(|| "assets/repos".into());
 
         if let Err(error) = repos::run(Path::new(&out)) {
             fail(&error.to_string());
@@ -98,29 +98,32 @@ fn fail(message: &str) -> ! {
 }
 
 fn run(public: &Path, drafts: bool, base: &str) -> Result<()> {
-    let index = public.join("index.html");
-    let template =
-        fs::read_to_string(&index).map_err(|e| format!("cannot read {}: {e}", index.display()))?;
-    let template = strip_previous(&template);
-
     let fonts = card::Fonts::load();
     fs::create_dir_all(public.join("og"))?;
 
     for page in pages(drafts) {
-        let png = card::render(&page.kind, &page.route, &fonts)?;
-        let html = template.replace(
-            "</head>",
-            &format!("  {}\n  </head>", head(&page, base, &version(&png))?),
-        );
         let out = if page.route == "/" {
-            index.clone()
+            public.join("index.html")
         } else {
             public
                 .join(page.route.trim_start_matches('/'))
                 .join("index.html")
         };
+        let source = fs::read_to_string(&out).map_err(|e| {
+            format!(
+                "cannot read {} (is {} in [build] prerender?): {e}",
+                out.display(),
+                page.route
+            )
+        })?;
+        let source = strip_title(&strip_previous(&source));
+        let png = card::render(&page.kind, &page.route, &fonts)?;
+        let html = source.replacen(
+            "</head>",
+            &format!("  {}\n  </head>", head(&page, base, &version(&png))?),
+            1,
+        );
 
-        fs::create_dir_all(out.parent().ok_or("the page has no directory")?)?;
         fs::write(&out, html)?;
         fs::write(public.join("og").join(format!("{}.png", page.image)), png)?;
 
@@ -133,6 +136,16 @@ fn run(public: &Path, drafts: bool, base: &str) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn strip_title(html: &str) -> String {
+    match (html.find("<title>"), html.find("</title>")) {
+        (Some(start), Some(end)) if start < end => {
+            let after = html[end + "</title>".len()..].trim_start_matches('\n');
+            format!("{}{after}", &html[..start])
+        }
+        _ => html.to_string(),
+    }
 }
 
 fn strip_previous(html: &str) -> String {
@@ -372,6 +385,13 @@ mod tests {
     #[test]
     fn summary_cuts_at_a_word() {
         assert_eq!(summary("one two three four", 9), "one two...");
+    }
+
+    #[test]
+    fn the_title_of_the_page_is_replaced() {
+        let page = "<head>\n<title>meetzli</title>\n<meta charset=\"utf-8\">\n</head>";
+
+        assert_eq!(strip_title(page), "<head>\n<meta charset=\"utf-8\">\n</head>");
     }
 
     #[test]

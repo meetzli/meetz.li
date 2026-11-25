@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 PORT="${PORT:-8080}"
-DX_PORT="${DX_PORT:-8082}"
+YAWN_PORT="${YAWN_PORT:-3001}"
 LOG=target/prerender-dev.log
 
 cargo build --release --manifest-path tools/prerender/Cargo.toml
@@ -12,10 +12,10 @@ mkdir -p target
 
 tools/prerender/target/release/prerender serve \
     --port "$PORT" \
-    --upstream "http://127.0.0.1:$DX_PORT" >"$LOG" 2>&1 &
+    --upstream "http://127.0.0.1:$YAWN_PORT" >"$LOG" 2>&1 &
 proxy=$!
 trap 'kill "$proxy" 2>/dev/null || true' EXIT
 
-echo "og proxy on http://localhost:$PORT, dx serve on $DX_PORT (log: $LOG)"
+echo "og proxy on http://localhost:$PORT, yawn dev on $YAWN_PORT (log: $LOG)"
 
-dx serve --web --port "$DX_PORT" --hot-patch=false "$@"
+yawn dev --port "$YAWN_PORT" "$@"

@@ -10,8 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DX_VERSION: 0.8.0-alpha.1
-  PUBLIC_DIR: target/dx/meetzli/release/web/public
+  PUBLIC_DIR: dist/public
 
 jobs:
   deploy:
@@ -30,16 +29,8 @@ jobs:
             tools/prerender
             tools/github-share
 
-      - name: Cache dx
-        id: dx-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin/dx
-          key: dx-${{ env.DX_VERSION }}
-
-      - name: Install dx
-        if: steps.dx-cache.outputs.cache-hit != 'true'
-        run: cargo install dioxus-cli --version ${{ env.DX_VERSION }} --locked
+      - name: Install yawn
+        run: cargo install yawn-cli --git https://github.com/yawn-rs/yawn --locked
 
       - uses: actions/setup-node@v4
         with:
@@ -59,11 +50,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bundle
-        run: dx bundle --release --web
+      - name: Build
+        run: yawn build --static
 
-      - name: Prerender
+      - name: Social cards
         run: cargo run --release --manifest-path tools/prerender/Cargo.toml -- ${{ env.PUBLIC_DIR }}
+
+      - name: Routes
+        run: cp cloudflare/_routes.json ${{ env.PUBLIC_DIR }}/_routes.json
 
       - name: Publish
         uses: cloudflare/wrangler-action@v3

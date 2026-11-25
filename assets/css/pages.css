@@ -62,7 +62,7 @@ article {
     transition: background-color 0.4s ease 0.2s, border-color 0.4s ease 0.2s;
 }
 
-.project.visible::after {
+.project[data-visible]::after {
     background: var(--accent);
     border-color: var(--accent);
 }
@@ -90,7 +90,7 @@ article {
     }
 }
 
-.project.visible::after {
+.project[data-visible]::after {
     background: var(--accent);
     border-color: var(--accent);
 }
@@ -122,7 +122,7 @@ article {
     }
 }
 
-.project.visible {
+.project[data-visible] {
     opacity: 1;
     transform: none;
 }

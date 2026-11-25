@@ -1,25 +1,33 @@
 (() => {
-    const state = { lenis: null, typed: false };
+    const state = { lenis: null, main: null, looping: false, typed: false, typing: false };
 
     const prefersReducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function smoothScroll() {
-        if (state.lenis || !window.Lenis || prefersReducedMotion()) return;
-
         const main = document.querySelector('main');
-        const lenis = new Lenis({
+        if (!main || !window.Lenis || prefersReducedMotion()) return;
+        if (state.lenis && state.main === main) return;
+
+        if (state.lenis) state.lenis.destroy();
+
+        state.main = main;
+        state.lenis = new Lenis({
             wrapper: main,
             content: main,
             eventsTarget: window,
             lerp: 0.1,
             __experimental__naiveDimensions: true,
         });
+
+        if (state.looping) return;
+
+        state.looping = true;
+
         const frame = (time) => {
-            lenis.raf(time);
+            if (state.lenis) state.lenis.raf(time);
             requestAnimationFrame(frame);
         };
 
-        state.lenis = lenis;
         requestAnimationFrame(frame);
     }
 
@@ -35,14 +43,18 @@
                     .filter((entry) => entry.isIntersecting)
                     .forEach((entry, index) => {
                         entry.target.style.transitionDelay = `${index * 120}ms`;
-                        entry.target.classList.add('visible');
+                        entry.target.dataset.visible = '';
                         observer.unobserve(entry.target);
                     });
             },
             { threshold: 0.15 },
         );
 
-        document.querySelectorAll(selector).forEach((element) => observer.observe(element));
+        document.querySelectorAll(selector).forEach((element) => {
+            if (element.dataset.reveal) return;
+            element.dataset.reveal = '1';
+            observer.observe(element);
+        });
     }
 
     function textNodes(root) {
@@ -61,11 +73,14 @@
         if (!root) return;
 
         const supported = window.CSS && CSS.highlights;
+        if (state.typing) return;
+
         if (state.typed || !supported || prefersReducedMotion()) {
             root.classList.remove('typing');
             return;
         }
 
+        state.typing = true;
         state.typed = true;
 
         const nodes = textNodes(root);
@@ -85,7 +100,8 @@
         CSS.highlights.set('typed', highlight);
 
         const finish = () => {
-            root.classList.remove('typing');
+            state.typing = false;
+            document.querySelectorAll('article.typing').forEach((article) => article.classList.remove('typing'));
             CSS.highlights.delete('typed');
             setTimeout(() => caret.remove(), 1200);
         };
@@ -93,7 +109,7 @@
         let typed = 0;
 
         const tick = () => {
-            if (typed >= total) return finish();
+            if (typed >= total || !root.isConnected) return finish();
 
             try {
                 typed += 1;
@@ -129,5 +145,28 @@
         setTimeout(tick, 200);
     }
 
-    window.site = { smoothScroll, resetScroll, reveal, typewrite };
+    let path = location.pathname;
+
+    function page() {
+        smoothScroll();
+
+        if (location.pathname !== path) {
+            path = location.pathname;
+            resetScroll();
+        }
+
+        if (document.querySelector('article.typing')) typewrite();
+        if (document.querySelector('.project:not([data-reveal])')) reveal('.project');
+    }
+
+    function start() {
+        page();
+        new MutationObserver(() => requestAnimationFrame(page)).observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
 })();

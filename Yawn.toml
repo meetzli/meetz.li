@@ -1,0 +1,10 @@
+[app]
+title = "meetzli | Rust developer"
+stylesheets = ["/assets/css/base.css", "/assets/css/layout.css", "/assets/css/components.css", "/assets/css/pages.css"]
+scripts = ["/assets/js/lenis.min.js", "/assets/js/site.js"]
+
+[dev]
+assets = "assets"
+
+[build]
+prerender = ["/blog/how-hdo-works"]

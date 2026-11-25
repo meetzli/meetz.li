@@ -7,3 +7,5 @@
 
 /tools/github-share/target
 /tools/github-share/pkg
+/dist
+/.yawn
