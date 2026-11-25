@@ -94,7 +94,7 @@
 
         const caret = document.createElement('span');
         caret.className = 'caret';
-        root.appendChild(caret);
+        document.body.appendChild(caret);
 
         const highlight = new Highlight();
         CSS.highlights.set('typed', highlight);
@@ -129,9 +129,8 @@
                 last.setEnd(nodes[index], offset);
 
                 const rect = last.getBoundingClientRect();
-                const base = root.getBoundingClientRect();
-                caret.style.left = `${rect.right - base.left}px`;
-                caret.style.top = `${rect.top - base.top}px`;
+                caret.style.left = `${rect.right}px`;
+                caret.style.top = `${rect.top}px`;
                 caret.style.height = `${rect.height}px`;
 
                 const pause = /[.,:]/.test(nodes[index].data[offset - 1]);

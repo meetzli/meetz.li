@@ -198,7 +198,7 @@ article.typing a {
 }
 
 .caret {
-    position: absolute;
+    position: fixed;
     width: 0.55em;
     background: var(--accent);
     pointer-events: none;
